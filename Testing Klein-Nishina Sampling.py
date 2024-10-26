@@ -1,135 +1,115 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.constants import electron_mass, c
-from scipy import integrate
 
-def klein_nishina_polarized(cos_theta, energy_kev, phi):
-    """
-    Calculate the Klein-Nishina differential cross section for polarized photons.
-    
-    Parameters:
-    cos_theta: cosine of scattering angle theta
-    energy_kev: incident photon energy in keV
-    phi: azimuthal angle in radians
-    """
-    # Convert energy to dimensionless parameter
-    epsilon = energy_kev / 511.0  # Energy in units of electron rest mass
-    
-    # Calculate sin theta
-    sin_theta = np.sqrt(1 - cos_theta**2)
-    
-    # Calculate ratio of scattered to incident photon energy
-    epsilon_prime = 1 / (1 + epsilon * (1 - cos_theta))
-    
-    # Calculate the unpolarized part
-    term1 = epsilon_prime**2 * (epsilon/epsilon_prime + epsilon_prime/epsilon - sin_theta**2 * np.cos(phi)**2)
-    
-    return term1
+# Constants
+r0 = 2.8179403227e-15  # classical electron radius in meters
+epsilon_0 = 0.4  # Initial photon energy (in units of electron rest energy)
+num_samples = 100000  # Number of samples to generate
 
-def rejection_sampling(n_samples, energy_kev):
-    """
-    Perform rejection sampling to generate scattered angles from Klein-Nishina distribution.
+# Functions for Klein-Nishina sampling
+def differential_cross_section(theta, phi, epsilon_0):
+    epsilon = epsilon_0 / (1 + epsilon_0 * (1 - np.cos(theta)))
+    return 0.5 * r0**2 * (epsilon / epsilon_0)**2 * (
+        epsilon_0 / epsilon + epsilon / epsilon_0 - 2 * np.sin(theta)**2 * np.cos(phi)**2
+    )* (np.sin(theta))
+
+def total_cross_section(epsilon_0):
+    term1 = (1 + epsilon_0) / epsilon_0**3
+    term2 = (2 * epsilon_0 * (1 + epsilon_0)) / (1 + 2 * epsilon_0)
+    term3 = np.log(1 + 2 * epsilon_0)
+    term4 = (1 + 3 * epsilon_0) / (1 + 2 * epsilon_0)**2
+    sigma_kn = 2 * np.pi * r0**2 * (
+        term1 * (term2 - term3) + term3 / (2 * epsilon_0) - term4
+    )
+    return sigma_kn
+
+def klein_nishina_probability(theta, phi, epsilon_0):
+    dsigma_domega = differential_cross_section(theta, phi, epsilon_0)
+    sigma_kn = total_cross_section(epsilon_0)
+    return dsigma_domega / sigma_kn
+
+def rejection_sampling(epsilon_0, num_samples):
+    samples = []
+    max_prob = 1  # Set a suitable max probability; adjust if necessary for efficiency
     
-    Parameters:
-    n_samples: number of samples to generate
-    energy_kev: incident photon energy in keV
-    
-    Returns:
-    theta_accepted: array of accepted theta values
-    phi_accepted: array of accepted phi values
-    """
-    # Initialize arrays to store accepted values
-    theta_accepted = []
-    phi_accepted = []
-    
-    # Find approximate maximum of distribution for given energy
-    cos_theta_grid = np.linspace(-1, 1, 1000)
-    phi_grid = np.linspace(0, 2*np.pi, 1000)
-    max_val = 0
-    
-    for cos_theta in cos_theta_grid:
-        for phi in phi_grid:
-            val = klein_nishina_polarized(cos_theta, energy_kev, phi)
-            if val > max_val:
-                max_val = val
-    
-    # Add safety factor to maximum
-    max_val *= 1.1
-    
-    # Perform rejection sampling
-    accepted = 0
-    iterations = 0
-    max_iterations = n_samples * 1000  # Safety limit
-    
-    while accepted < n_samples and iterations < max_iterations:
-        # Generate random angles
-        cos_theta = np.random.uniform(-1, 1)
-        phi = np.random.uniform(0, 2*np.pi)
+    while len(samples) < num_samples:
+        theta = np.random.uniform(0, np.pi)     # Theta from 0 to π
+        phi = np.random.uniform(0, 2 * np.pi)   # Phi from 0 to 2π
+        p_theta_phi = klein_nishina_probability(theta, phi, epsilon_0)
+        u = np.random.uniform(0, max_prob)
         
-        # Calculate probability
-        prob = klein_nishina_polarized(cos_theta, energy_kev, phi)
-        
-        # Accept or reject
-        if np.random.uniform(0, max_val) < prob:
-            theta_accepted.append(np.arccos(cos_theta))
-            phi_accepted.append(phi)
-            accepted += 1
-        
-        iterations += 1
+        if u < p_theta_phi:
+            samples.append((theta, phi))
     
-    return np.array(theta_accepted), np.array(phi_accepted)
+    return samples
 
-# Test the sampling
-energy_kev = 100  # Test with 100 keV photons
-n_samples = 10000
-
-# Perform sampling
-theta_samples, phi_samples = rejection_sampling(n_samples, energy_kev)
-
-# Create visualization
-plt.figure(figsize=(15, 5))
+# Generate samples
+samples = rejection_sampling(epsilon_0, num_samples)
+thetas, phis = zip(*samples)
 
 # Plot theta distribution
-plt.subplot(131)
-plt.hist(theta_samples, bins=50, density=True, alpha=0.7)
-plt.xlabel('Theta (radians)')
-plt.ylabel('Density')
-plt.title('Theta Distribution')
+plt.figure(figsize=(12, 5))
 
-# Plot phi distribution
-plt.subplot(132)
-plt.hist(phi_samples, bins=50, density=True, alpha=0.7)
-plt.xlabel('Phi (radians)')
-plt.ylabel('Density')
-plt.title('Phi Distribution')
+# Theta histogram
+plt.subplot(1, 2, 1)
+plt.hist(thetas, bins=50, density=True, color='skyblue', edgecolor='black')
+plt.xlabel(r"$\theta$ (radians)")
+plt.ylabel("Probability Density")
+plt.title(r"Distribution of $\theta$")
 
-# Create 2D histogram
-plt.subplot(133)
-plt.hist2d(theta_samples, phi_samples, bins=50, cmap='viridis')
-plt.xlabel('Theta (radians)')
-plt.ylabel('Phi (radians)')
-plt.title('2D Distribution')
-plt.colorbar(label='Counts')
+# Phi histogram
+plt.subplot(1, 2, 2)
+plt.hist(phis, bins=50, density=True, color='salmon', edgecolor='black')
+plt.xlabel(r"$\phi$ (radians)")
+plt.ylabel("Probability Density")
+plt.title(r"Distribution of $\phi$")
 
 plt.tight_layout()
 plt.show()
 
-# Print some statistics
-print(f"Number of accepted samples: {len(theta_samples)}")
-print(f"Mean theta: {np.mean(theta_samples):.3f} radians")
-print(f"Mean phi: {np.mean(phi_samples):.3f} radians")
+plt.savefig('Klein-Nishina-Sampling_theta_and_phi_histograms.png')
 
-#make a plot of the Klein-Nishina differential cross section
-theta = np.linspace(0, np.pi, 1000)
-energy_kev = 100
-phi = 0
-differential_cross_section = klein_nishina_polarized(np.cos(theta), energy_kev, phi)
 
-plt.figure()
-plt.plot(theta, differential_cross_section)
-plt.xlabel('Theta (radians)')
-plt.ylabel('Differential Cross Section')
-plt.title('Klein-Nishina Differential Cross Section')
+# Convert spherical coordinates to Mollweide coordinates
+x = np.array(phis) - np.pi  # Shift phi to range [-pi, pi] for Mollweide projection
+y = np.pi/2 - np.array(thetas)  # Convert theta to "latitude" for Mollweide projection
+
+# Plot heatmap on spherical (Mollweide) plot
+plt.figure(figsize=(10, 5))
+plt.subplot(111, projection="mollweide")
+plt.hexbin(x, y, gridsize=100, cmap='plasma', mincnt=1)
+plt.colorbar(label='Sample Density')
+plt.xlabel(r"$\phi$ (radians)")
+plt.ylabel(r"$\theta$ (radians)")
+plt.title("Heatmap of Sampled $(\theta, \phi)$ on a Spherical (Mollweide) Plot")
+plt.grid(True)
 plt.show()
 
+plt.savefig('Klein-Nishina-Sampling_spherical distribution.png')
+
+#analytically plot the KN distribution using a molleweide projection
+# Generate grid of theta and phi values
+theta_vals = np.linspace(0, np.pi, 300)    # theta from 0 to π
+phi_vals = np.linspace(0, 2 * np.pi, 300)  # phi from 0 to 2π
+theta_grid, phi_grid = np.meshgrid(theta_vals, phi_vals)
+
+# Calculate probability density over the grid
+P_grid = klein_nishina_probability(theta_grid, phi_grid, epsilon_0)
+
+# Convert to Mollweide projection coordinates
+x = phi_grid - np.pi
+y = np.pi / 2 - theta_grid
+
+# Plot the theoretical probability density
+plt.figure(figsize=(10, 5))
+plt.subplot(111, projection="mollweide")
+plt.pcolormesh(x, y, P_grid, cmap='plasma', shading='auto')
+plt.colorbar(label='Analytical Probability Density')
+plt.xlabel(r"$\phi$ (radians)")
+plt.ylabel(r"$\theta$ (radians)")
+plt.title("Analytical Probability Density $P(\\theta, \\phi)$ on a Spherical (Mollweide) Plot")
+plt.grid(True)
+plt.show()
+
+plt.savefig('Klein-Nishina-Sampling_analytical distribution.png')
 
