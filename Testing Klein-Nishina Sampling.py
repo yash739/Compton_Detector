@@ -65,9 +65,10 @@ plt.ylabel("Probability Density")
 plt.title(r"Distribution of $\phi$")
 
 plt.tight_layout()
-plt.show()
 
 plt.savefig('Klein-Nishina-Sampling_theta_and_phi_histograms.png')
+plt.show()
+
 
 
 # Convert spherical coordinates to Mollweide coordinates
@@ -81,11 +82,9 @@ plt.hexbin(x, y, gridsize=100, cmap='plasma', mincnt=1)
 plt.colorbar(label='Sample Density')
 plt.xlabel(r"$\phi$ (radians)")
 plt.ylabel(r"$\theta$ (radians)")
-plt.title("Heatmap of Sampled $(\theta, \phi)$ on a Spherical (Mollweide) Plot")
 plt.grid(True)
+plt.savefig('Klein-Nishina-Sampling_heatmap.png')
 plt.show()
-
-plt.savefig('Klein-Nishina-Sampling_spherical distribution.png')
 
 #analytically plot the KN distribution using a molleweide projection
 # Generate grid of theta and phi values
@@ -107,9 +106,8 @@ plt.pcolormesh(x, y, P_grid, cmap='plasma', shading='auto')
 plt.colorbar(label='Analytical Probability Density')
 plt.xlabel(r"$\phi$ (radians)")
 plt.ylabel(r"$\theta$ (radians)")
-plt.title("Analytical Probability Density $P(\\theta, \\phi)$ on a Spherical (Mollweide) Plot")
+#plt.title("Analytical Probability Density $P(\\theta, \\phi)$ on a Spherical (Mollweide) Plot")
 plt.grid(True)
-plt.show()
 
 plt.savefig('Klein-Nishina-Sampling_analytical distribution.png')
-
+plt.show()
