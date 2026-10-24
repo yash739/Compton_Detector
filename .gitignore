@@ -23,9 +23,15 @@ Thumbs.db
 *.log
 results/*
 !results/README.md
-!results/summary_*.csv
+!results/*.csv
 !results/figures/
 !results/figures/*.png
+
+# package data tables
+!czt_mc/data/*.csv
+
+# helper launchers for WSL
+.run*.sh
 
 # the report is tracked under docs/ only
 !docs/*.pdf

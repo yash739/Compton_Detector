@@ -1,0 +1,5 @@
+numpy>=1.24
+scipy>=1.10
+matplotlib>=3.7
+pytest>=7
+xraydb>=4.5      # only for scripts/make_cross_section_tables.py (the tables are committed); astropy is needed for scripts/analyse_pixel_table.py
