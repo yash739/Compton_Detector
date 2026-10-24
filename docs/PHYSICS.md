@@ -1,0 +1,9 @@
+# Physics, conventions and approximations
+
+* Material Cd(0.9)Zn(0.1)Te, 5.78 g/cm3. Photoabsorption, incoherent and coherent attenuation come from the Elam tables (xraydb) and agree with the NIST element tables to 0.1% between 60 and 600 keV.
+* An interaction is photoabsorption or a Compton scatter with probabilities photo : incoherent. Coherent scattering deposits nothing and is treated as no interaction.
+* Compton scattering samples the polarised Klein-Nishina cross section exactly (cos theta, then the azimuth from the E vector), no discarded photons. The azimuth is measured from the E vector; scattering peaks perpendicular to it.
+* Photoabsorption on the K shell of Cd, Zn or Te (fraction 1 - 1/jump ratio of that element's photoabsorption) emits a K X-ray with the fluorescence yield (Cd 0.84, Zn 0.47, Te 0.88); lines and intensities from xraydb. The X-ray travels isotropically, is attenuated with the real coefficient at its energy (66-170 micrometres for the Cd and Te lines) and can be absorbed in a neighbouring pixel, or escape.
+* Events: deposits are summed per pixel; a pixel triggers above 20 keV; a double is two triggered adjacent pixels with summed energy 100-600 keV; there is **no upper limit on E_high/E_low** (the old cut was 6). The lower-energy pixel is the scatter site and the direction from it to the other pixel is the 8-bin azimuth (bin i centred on i x 45 degrees). Only doubles whose lower-energy pixel is in the central 3 x 3 block of the 7 x 7 array are counted, so the illumination is uniform and edge effects do not enter.
+* PA is the E-vector angle. The modulation peaks at PA + 90 degrees. The old notebooks' `pref_angle` is the scattering direction, i.e. PA + 90.
+* Not modelled: electron range, charge sharing, energy resolution, Doppler broadening and binding, coherent-scattering angles, L fluorescence escape, the mask, spacecraft or anything outside the module.
