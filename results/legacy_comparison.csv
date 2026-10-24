@@ -1,0 +1,21 @@
+E_keV,PA_deg,variant,doubles_per_1e6_photons,mu_A_over_B,fitted_peak_deg
+200,0,real attenuation + K fluorescence (this package),58582,0.21534,90.628
+200,0,same histograms fitted at the notebooks' bin centres,58582,0.1961,91.45
+200,0,"same, no upper ratio limit vs E_high/E_low <= 6",39942,0.31145,90.312
+200,0,"old attenuation 2.64 /cm, always Compton",76107,0.29556,90.271
+200,0,"real attenuation, fluorescence switched off",43903,0.31755,89.579
+200,45,real attenuation + K fluorescence (this package),58645,0.52829,135.17
+200,45,same histograms fitted at the notebooks' bin centres,58645,0.50741,134.49
+200,45,"same, no upper ratio limit vs E_high/E_low <= 6",39949,0.56921,135.32
+200,45,"old attenuation 2.64 /cm, always Compton",75974,0.4704,135.07
+200,45,"real attenuation, fluorescence switched off",43836,0.51816,135.21
+300,0,real attenuation + K fluorescence (this package),42665,0.2385,89.366
+300,0,same histograms fitted at the notebooks' bin centres,42665,0.21933,90.481
+300,0,"same, no upper ratio limit vs E_high/E_low <= 6",34109,0.30298,89.289
+300,0,"old attenuation 2.64 /cm, always Compton",1.3855e+05,0.29618,89.797
+300,0,"real attenuation, fluorescence switched off",37279,0.2864,89.857
+300,45,real attenuation + K fluorescence (this package),42715,0.47463,134.97
+300,45,same histograms fitted at the notebooks' bin centres,42715,0.45008,134.64
+300,45,"same, no upper ratio limit vs E_high/E_low <= 6",34206,0.49235,135.18
+300,45,"old attenuation 2.64 /cm, always Compton",1.3813e+05,0.46778,134.95
+300,45,"real attenuation, fluorescence switched off",37425,0.47603,134.75
