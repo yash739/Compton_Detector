@@ -1,0 +1,31 @@
+# virtual environments and caches
+new_env/
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# generated outputs: keep only what is whitelisted below
+*.png
+*.pdf
+*.csv
+*.npz
+*.npy
+*.log
+results/*
+!results/README.md
+!results/summary_*.csv
+!results/figures/
+!results/figures/*.png
+
+# the report is tracked under docs/ only
+!docs/*.pdf
